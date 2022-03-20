@@ -1,0 +1,14 @@
+﻿<h2>Free Slots List</h2>
+<ul class="abc">
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            <li>Gap Start Time: @item.StartTime Gap End Time: @item.EndTime</li>
+
+        }
+    }
+
+</ul>
+   
+

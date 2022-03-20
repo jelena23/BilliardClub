@@ -1,0 +1,48 @@
+﻿@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('#resTable').DataTable();
+        });
+
+    </script>
+}
+<h2>Reservation List</h2>
+<table class="table table-bordered table-striped" id="resTable">
+    <thead>
+    
+        <tr>
+            <th>Reservation Made</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Table ID</th>
+        </tr>
+
+    </thead>
+    <tbody>
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @item.ResDateTime
+            </td>
+            <td>
+                @item.StartTime
+            </td>
+            <td>
+                @item.EndTime
+            </td>
+            <td>
+                @item.BilliardTableId
+            </td>
+        </tr>
+        }
+        {
+            
+        }
+    }
+    </tbody>
+
+</table>

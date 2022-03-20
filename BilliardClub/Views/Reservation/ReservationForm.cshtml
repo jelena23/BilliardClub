@@ -1,0 +1,95 @@
+﻿@model BilliardClub.ViewModels.ReservationFormViewModel
+@{
+    ViewBag.Title = "ReservationForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Reservation Form</h2>
+
+@using (Html.BeginForm("Save", "Reservation"))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.Reservation.BilliardTableId)
+        @Html.DropDownListFor(m => m.Reservation.BilliardTableId, new SelectList(Model.BilliardTables, "BilliardTableId", "Position"), "Select Table", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Reservation.BilliardTableId)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Reservation.StartTime)
+        @Html.TextBoxFor(m => m.Reservation.StartTime, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Reservation.StartTime)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Reservation.EndTime)
+        @Html.TextBoxFor(m => m.Reservation.EndTime, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Reservation.EndTime)
+    </div>
+
+    @Html.HiddenFor(m => m.Reservation.ClientId)
+    <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
+    <br /><br />
+    <div id="dataTableSlots"></div>
+    <br /><br />
+    <div id="dataTable"></div>
+
+
+}
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#Reservation_BilliardTableId").on("change",
+                function() {
+                    var id = $(this).find(":selected").val();
+                    var model = $('#dataTableSlots');
+                    $.ajax({
+                            url: '/Reservation/FreeSlotsForTable/' + id,
+                            contentType: 'application/html ; charset:utf-8',
+                            type: 'GET',
+                            dataType: 'html'
+                        })
+                        .success(function(result) {
+                            model.empty().append(result);
+                        });
+
+                });
+
+        });
+
+    </script>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+    <script src="~/Scripts/jquery.signalR-1.0.0.js"></script>
+    <script src="http://localhost:61846/signalr/hubs"></script>
+
+    <script>
+        $(function() {
+            var hubConnection = $.connection.reservationHub;
+            console.warn("hubConnection ---->", hubConnection);
+            console.warn("$.connection.hub ---->", $.connection.hub);
+
+            $.connection.hub.start().done(function() {
+                FetchReservations();
+            });
+
+            hubConnection.client.updatedClients = function() {
+                FetchReservations();
+            };
+        });
+
+        function FetchReservations() {
+            var model = $('#dataTable');
+            $.ajax({
+                    url: '/Reservation/GetAllReservationRecords',
+                    contentType: 'application/html ; charset:utf-8',
+                    type: 'GET',
+                    dataType: 'html'
+                })
+                .success(function(result) {
+                    model.empty().append(result);
+                });
+        }
+    </script>
+
+}
